@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Mohave:wght@300&family=Satisfy&family=Zen+Kaku+Gothic+Antique:wght@300&family=Zilla+Slab:ital,wght@0,300;1,300&display=swap" rel="stylesheet">
+    <link type="text/css" rel="stylesheet" href="mlb.css">
+
+    <title>MLB_Project1_EBelaineh</title>
+    
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <img src="mlb_banner_.jpg" alt="mlb banner">
+        </div>
+    
+    <div id="dropdown">
+        <P>Select Year Month and Date</P>
+    <form id="form">
+        
+        <select name="year" id="year">
+            <option value="">Year</option>
+            <option value="2020">2020</option>
+            <option value="2021">2021</option>
+            <option value="2022">2022</option>
+        </select>
+        <select name="month" id="month">
+            <option value="">Month</option>
+                <script>
+                for(var i=1; i<=12; i++){
+                    if(i==10 ||i ==11 || i == 12){
+                        document.write("<option>"+ i + "</option>");
+
+                    } else
+                    document.write("<option>"+ 0+ i + "</option>");
+                    }
+                     
+                
+                
+            </script>    
+        </select>
+        <select name="day" id="day">
+            <option value="">Day</option>
+                <script>
+                for(var i=1; i<=31; i++){
+                    if(i>9){
+                        document.write("<option>"+ i + "</option>");
+
+                    } else
+                    document.write("<option>"+ 0+ i + "</option>");
+                    }
+            </script> 
+        </select>
+        </br></br><input type="button" value ="Retrieve" class="btn" onclick="getDataAsynch();"/>
+    </div>
+
+
+
+    <div id ="dump">
+        <form>
+            <div class="row">
+                <img src="banner_mlb.jpg" alt="">
+                </div>
+                <div class="result">
+                <div class="one">
+                    <div class="home"><label>Home Team Name: </label></div>
+                    <div class="inputb"><input type="text" id="home_team_name" /></div></br></br>
+                </div>
+                <div class="two">
+                    <div class="away"><label>Away Team Name: </label></div>
+                    <div class="inputb"><input type="text" id="away_team_name" /></div></br></br>
+                </div>
+                <div class="three">
+                    <div class="winning"><label>Winning Pitcher: </label></div>
+                    <div class="winninginput"><input type="text" id="winning_pitcher" /></div></br></br>
+               </div>
+               <div class="four">
+                    <div class="loosing"><label>Loosing Pitcher: </label></div>
+                    <div class="loosinginput"><input type="text" id="loosing_pitcher" /></div></br></br>
+               </div>
+               <div class="five">
+                    <div class="venu"><label>Venu: </label></div>
+                    <div class="inputvenu"><input type="text" id="venu" /></div></br></br></br>
+                </div>
+                <div class="buttons">
+                    <input type="button" class="btn" value ="Previous Game" id="previous_game" onclick="getPrev();"/>
+                    <input type="button" class="btn" value ="Next Game" id="next_game" onclick="getNext();"/></br></br>
+                    <input type="button" class="changes" value ="Save Changes" id="save_changes" onclick="saveChanges();"/></br>
+                    
+
+                </div>
+        
+            </div>
+    </form>
+
+    </div>
+</div>
+<footer>
+    <p>MLB_Project1_EBelaineh</p>
+</footer>
+
+
+    
+    
+</body>
+<script>
+    // value of input box
+txbhomeTeam = document.getElementById("home_team_name") ;
+txbawayTeam = document.getElementById("away_team_name") ;
+txbwinning_pitcher = document.getElementById("winning_pitcher");
+txbloosing_pitcher = document.getElementById("loosing_pitcher") ;
+txbvenu = document.getElementById("venu");
+
+
+const ISOK = 200;
+var current = 0;
+var request = new XMLHttpRequest();
+var jsObject;
+
+
+function getJSONAsync(url) {
+
+    request.onload = function (){
+        if (request.status === ISOK) {
+            window.jsObject = JSON.parse(request.responseText);
+            console.log(url);
+            console.log(jsObject);
+            console.log(jsObject.data.games.game);
+
+            if(jsObject.data.games.game == undefined){
+            window.alert("no record");
+        }else{
+            console.log("success");
+            
+            var counter = jsObject.data.games.game.length;
+        
+            if(counter >0){
+                var homeTeam = jsObject.data.games.game[0].home_team_name;
+                var awayTeam = jsObject.data.games.game[0].away_team_name;
+                var winningFirstname = jsObject.data.games.game[0].winning_pitcher.first;
+                var winningLastname = jsObject.data.games.game[0].winning_pitcher.last;
+                var loosingFirstname = jsObject.data.games.game[0].losing_pitcher.first;
+                var loosingLastname = jsObject.data.games.game[0].losing_pitcher.last;
+                var venu = jsObject.data.games.game[0].venue;
+			
+            }else{
+                window.alert("no record"); 
+            }
+            //populating first game 
+            txbhomeTeam.value = homeTeam ;
+            txbawayTeam.value = awayTeam ;
+            txbwinning_pitcher.value = winningFirstname + " " + winningLastname;
+            txbloosing_pitcher.value = loosingFirstname + " " +  loosingLastname;
+            txbvenu.value = venu;
+        }
+    } // end if staus check 
+    else{
+        window.alert("error loading the data"); 
+     }
+
+    }
+	request.open("GET", url, true);
+	request.send();
+}
+
+
+function getNext() {
+    // disabling next button when currnet is 0
+    document.getElementById("previous_game").disabled = false;
+
+     // clear input box
+    txbhomeTeam.value = " " ;
+    txbawayTeam.value = " " ;
+    txbwinning_pitcher.value = " ";
+    txbloosing_pitcher.value = " ";
+    txbvenu.value = " ";
+        
+    var counter = jsObject.data.games.game.length;
+    if(current >= counter-1) {
+        return false;
+    }else{
+        current++;
+        if(current == counter-1 ){
+            document.getElementById("next_game").disabled = true;
+        }
+        //populating current game
+        var homeTeam = jsObject.data.games.game[current].home_team_name;
+        var awayTeam = jsObject.data.games.game[current].away_team_name;
+        var winningFirstname = jsObject.data.games.game[current].winning_pitcher.first;
+        var winningLastname = jsObject.data.games.game[current].winning_pitcher.last;
+        var loosingFirstname = jsObject.data.games.game[current].losing_pitcher.first;
+        var loosingLastname = jsObject.data.games.game[current].losing_pitcher.last;
+        var venu = jsObject.data.games.game[current].venue;
+
+        return showgames(homeTeam, awayTeam, winningFirstname, winningLastname, loosingFirstname, loosingLastname, venu);
+    }
+}
+
+function getPrev() {
+    current -1;
+    //disabling button when current > counter
+     document.getElementById("next_game").disabled = false;
+     
+     // clear input box
+     txbhomeTeam.value = " " ;
+     txbawayTeam.value = " " ;
+     txbwinning_pitcher.value = " ";
+     txbloosing_pitcher.value = " ";
+     txbvenu.value = " ";
+     var counter = jsObject.data.games.game.length;
+     if(current <= 0) {
+         return false;
+        }else{
+            current--;
+            if(current == 0){
+                document.getElementById("previous_game").disabled = true;
+            }else{
+                document.getElementById("previous_game").disabled = false;
+            }
+            
+            var homeTeam = jsObject.data.games.game[current].home_team_name;
+            var awayTeam = jsObject.data.games.game[current].away_team_name;
+            var winningFirstname = jsObject.data.games.game[current].winning_pitcher.first;
+            var winningLastname = jsObject.data.games.game[current].winning_pitcher.last;
+            var loosingFirstname = jsObject.data.games.game[current].losing_pitcher.first;
+            var loosingLastname = jsObject.data.games.game[current].losing_pitcher.last;
+            var venu = jsObject.data.games.game[current].venue;
+            
+            return showgames(homeTeam, awayTeam, winningFirstname, winningLastname, loosingFirstname, loosingLastname, venu);
+        }
+    }
+    
+    //showing next and previous result
+    function showgames(homeTeam, awayTeam, winningFirstname, winningLastname, loosingFirstname, loosingLastname, venu){
+        //populating input 
+        txbhomeTeam.value = homeTeam;
+        txbawayTeam.value = awayTeam  ;
+        txbwinning_pitcher.value = winningFirstname + " " + winningLastname ;
+        txbloosing_pitcher.value = loosingFirstname + " " + loosingLastname ;
+        txbvenu.value = venu;
+    }
+    
+    function saveChanges(){
+        var new_home_team =  txbhomeTeam.value;
+        var new_away_team =  txbawayTeam.value;
+        var new_winning = txbwinning_pitcher.value;
+        anew_winning =new_winning.split(" ");
+        var new_loosing = txbloosing_pitcher.value;
+        anew_loosing =new_loosing.split(" ");
+        var new_venu = txbvenu.value;
+        var counter = jsObject.data.games.game.length;
+        
+        //saving changes 
+        jsObject.data.games.game[0].home_team_name = new_home_team;
+        jsObject.data.games.game[0].away_team_name = new_away_team;
+        jsObject.data.games.game[0].winning_pitcher.first = anew_winning[0];
+        jsObject.data.games.game[0].winning_pitcher.last = anew_winning[1];
+        jsObject.data.games.game[0].losing_pitcher.first = anew_loosing[0];
+        jsObject.data.games.game[0].losing_pitcher.last = anew_loosing[1];
+        jsObject.data.games.game[0].venu = new_venu;
+        
+        var newJSON = JSON.stringify(jsObject);
+        var newparsedJson = JSON.parse(newJSON);
+              
+        console.log("Home Away Team :" + jsObject.data.games.game[0].home_team_name);
+        console.log("Away Team : " + jsObject.data.games.game[0].away_team_name);
+        console.log("Winning Pitcher First Name : " + jsObject.data.games.game[0].winning_pitcher.first);
+        console.log("Winning Pitcher Last Name : " + jsObject.data.games.game[0].winning_pitcher.last);
+        console.log("Loosing Pitcher First Name : " + jsObject.data.games.game[0].losing_pitcher.first);
+        console.log("Loosing Pitcher Last Name : "+ jsObject.data.games.game[0].losing_pitcher.last);
+        console.log("Venu : "+ jsObject.data.games.game[0].venu);
+            
+        console.log(newparsedJson);
+        console.log(newparsedJson.data.games.game);
+        window.alert("Your status has been saved!");
+    }
+        
+    
+    
+    function getDataAsynch() {
+        var year = document.getElementById('year').value;
+        var month = document.getElementById('month').value;
+        var day = document.getElementById('day').value;
+        
+        var tempURL = "https://gd2.mlb.com/components/game/mlb/year_" + year + "/month_" + month + "/day_" + day + "/master_scoreboard.json";
+        getJSONAsync(tempURL);
+    }
+              
+            
+</script>
+</html>
+
+              
+                
+		
